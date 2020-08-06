@@ -46,17 +46,20 @@ func mergeProfs(pfss [][]*cover.Profile) []*cover.Profile {
 	}
 	head, rest := pfss[0], pfss[1:]
 	ret := make([]*cover.Profile, 0, len(head))
-	for i, profile := range head {
+	for _, profile := range head {
 		for _, ps := range rest {
 			// find profiles
 			if len(ps) == 0 {
 				continue
-			} else if len(ps) < i+1 {
-				continue
-			} else if ps[i].FileName != profile.FileName {
+			} else {
+				for _, p := range ps {
+					if p.FileName == profile.FileName {
+						profile.Blocks = mergeProfBlocks(profile.Blocks, p.Blocks)
+						break
+					}
+				}
 				continue
 			}
-			profile.Blocks = mergeProfBlocks(profile.Blocks, ps[i].Blocks)
 		}
 		ret = append(ret, profile)
 	}
